@@ -32,6 +32,7 @@ $$
 $$
 
 This one has a major sixth (dorian mode, common in jazz). The classical (aeolian mode) alternative would be
+
 $$
 1\xrightarrow{9/8} 9/8\xrightarrow{16/15} 6/5\xrightarrow{10/9} 4/3\xrightarrow{9/8} 3/2\xrightarrow{16/15} 8/5\xrightarrow{10/9} 16/9\xrightarrow{9/8} 2.
 $$
