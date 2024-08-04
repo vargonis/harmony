@@ -52,5 +52,6 @@ class Percussion(Enum):
     MuteTriangle = 80
     OpenTriangle = 81
 
+    # This naive interface does not enable "muffling" or "muting" of the instrument. TODO: improve
     def __call__(self, velocity):
         output.send(mido.Message('note_on', channel=9, note=self.value, velocity=velocity))

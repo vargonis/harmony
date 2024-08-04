@@ -10,13 +10,13 @@ from .program import Program
 NoteId: TypeAlias = tuple[int, int]
 
 
-# TODO: make the Synth class below thread-safe?
+# NOTE: the class below is thread safe, because it only relies on list's pop and append.
 
 @dataclass
 class Synth:
     channels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15] # channel 9 is for percussion
 
-    def note_on(self, freq: Number, program: Program, velocity: int) -> NoteId:
+    def note_on(self, program: Program, freq: Number, velocity: int) -> NoteId:
         # the return value functions as an id, to turn the note off later (thus liberating its channel)
         try:
             channel = self.channels.pop()
@@ -34,15 +34,15 @@ class Synth:
         output.send(mido.Message('note_off', channel=nid[0], note=nid[1]))
         self.channels.append(nid[0])
 
-    def chord_on(self, base: float, chord: Iterable[Number], program: Program, velocities: int | Iterable[int]) -> list[NoteId]:
+    def chord_on(self, program: Program, base: float, chord: Iterable[Number], velocities: int | Iterable[int]) -> list[NoteId]:
         if isinstance(velocities, int):
             velocities = [velocities] * len(chord)
         # print(chord, velocities)
         note_ids = []
         for shift, velocity in zip(chord, velocities):
-            note_ids.append(self.note_on(base * shift, program, velocity))
+            note_ids.append(self.note_on(program, base * shift, velocity))
         return note_ids
 
-    def chord_off(self, note_ids: list[NoteId]) -> None: # NOTE: might be useful to take a delay arg here, for which we'd need a thread-safe version
+    def chord_off(self, note_ids: list[NoteId]) -> None:
         for note_id in note_ids:
             self.note_off(note_id)
