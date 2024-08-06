@@ -1,6 +1,15 @@
 from enum import Enum
+from numbers import Number
+import asyncio
+import mido
 
-class Program(Enum):
+from .output import output
+from .synth import Synth
+
+synth = Synth()
+
+
+class MelodicInstrument(Enum):
     YamahaGrandPiano = 0
     BrightYamahaGrand = 1
     ElectricPiano = 2
@@ -129,3 +138,71 @@ class Program(Enum):
     Helicopter = 125
     Applause = 126
     GunShot = 127
+
+    async def __call__(
+            self,
+            freq: Number | list[Number],
+            velocity: int | list[int],
+            duration: float,
+            delay: float = 0,
+        ):
+        if isinstance(freq, Number):
+            await synth.play(self, freq, velocity, duration, delay)
+        else:
+            await synth.play_chord(self, freq, velocity, duration, delay)
+
+
+class PercussiveInstrument(Enum):
+    AcousticBassDrum = 35
+    ElectricBassDrum = 36
+    SideStick = 37
+    AcousticSnare = 38
+    HandClap = 39
+    ElectricSnare = 40
+    LowFloorTom = 41
+    ClosedHihat = 42
+    HighFloorTom = 43
+    PedalHihat = 44
+    LowTom = 45
+    OpenHihat = 46
+    LowMidTom = 47
+    HighMidTom = 48
+    CrashCymbal1 = 49
+    HighTom = 50
+    RideCymbal1 = 51
+    ChineseCymbal = 52
+    RideBell = 53
+    Tambourine = 54
+    SplashCymbal = 55
+    Cowbell = 56
+    CrashCymbal2 = 57
+    Vibraslap = 58
+    RideCymbal2 = 59
+    HighBongo = 60
+    LowBongo = 61
+    MuteHighConga = 62
+    OpenHighConga = 63
+    LowConga = 64
+    HighTimbale = 65
+    LowTimbale = 66
+    HighAgogo = 67
+    LowAgogo = 68
+    Cabasa = 69
+    Maracas = 70
+    ShortWhistle = 71
+    LongWhistle = 72
+    ShortGuiro = 73
+    LongGuiro = 74
+    Claves = 75
+    HighWoodblock = 76
+    LowWoodblock = 77
+    MuteCuica = 78
+    OpenCuica = 79
+    MuteTriangle = 80
+    OpenTriangle = 81
+
+    # This naive interface does not enable "muffling" or "muting" of the instrument. TODO: improve
+    async def __call__(self, velocity: int, delay: float = 0):
+        if delay > 0:
+            await asyncio.sleep(delay)
+        output.send(mido.Message('note_on', channel=9, note=self.value, velocity=velocity))
