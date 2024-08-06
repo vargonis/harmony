@@ -10,22 +10,29 @@ A major third is $5/4$, and its complement to reach $3/2$ is $6/5$, a minor thir
 
 There is an amazing beauty in how those ratios fit together to create a system. Starting from a base frequency of 1, we can stack
 the most harmonic ratios $3/2$, $4/3$ and $5/4$ filling the (multiplicative) interval from $1$ to $2$, like this:
+
 $$
 1,\ 5/4,\ 4/3,\ 3/2,\ 5/3,\ 15/8,\ 2.
 $$
+
 The rationale behind the choice of the last two steps is: $4/3\cdot 5/4 = 5/3$, and $3/2\cdot 5/4 = 15/8$.
 Now, note that the (multiplicative) "distance" from $4/3$ to $3/2$ is $9/8$, whereas the distance from
 $3/2$ to $5/3$ is $10/9$. We see a remarkable progression of simple ratios that fit together to form the factor $2$.
 The distance from $5/4$ to $4/3$ $16/15$, which is also what's missing to get from $15/8$ to $2$. Thus, we can form a scale by stacking together the following sequence of increments:
+
 $$
 1\xrightarrow{9/8} 9/8\xrightarrow{10/9} 5/4\xrightarrow{16/15} 4/3\xrightarrow{9/8} 3/2\xrightarrow{10/9} 5/3\xrightarrow{9/8} 15/8\xrightarrow{16/15} 2.
 $$
+
 This is the major scale.
 We can also switch the internal decomposition of the fifth into major/minor thirds, to get a minor scale arrangement:
+
 $$
 1\xrightarrow{9/8} 9/8\xrightarrow{16/15} 6/5\xrightarrow{10/9} 4/3\xrightarrow{9/8} 3/2\xrightarrow{10/9} 5/3\xrightarrow{16/15} 16/9\xrightarrow{9/8} 2.
 $$
+
 This one has a major sixth (dorian mode, common in jazz). The classical (aeolian mode) alternative would be
+
 $$
 1\xrightarrow{9/8} 9/8\xrightarrow{16/15} 6/5\xrightarrow{10/9} 4/3\xrightarrow{9/8} 3/2\xrightarrow{16/15} 8/5\xrightarrow{10/9} 16/9\xrightarrow{9/8} 2.
 $$
@@ -35,14 +42,19 @@ $$
 ## Going deeper
 
 At the heart of harmony is the following fact:
+
 $$
 \frac{n+1}{n} = \frac{2n+2}{2n+1} \frac{2n+1}{2n}
 $$
+
 Thus, the octave is subdivided into a perfect fifth and a perfect fourth ($2 = 3/2\cdot 4/3$), and the perfect fifth is subdivided into a major third and a minor third ($3/2 = 5/4\cdot 6/5$). The western system is based on those two subdivisions. But what about the harmonic subdivision of the perfect fourth, $4/3 = 8/7\cdot 7/6$? Based on it, we can build the following pentatonic scale:
+
 $$
 1\xrightarrow{7/6} 7/6\xrightarrow{8/7} 4/3\xrightarrow{9/8} 3/2\xrightarrow{7/6} 7/4\xrightarrow{8/7} 2.
 $$
+
 It has simpler ratios, but does not have "thirds". <!-- it decomposes $4/3$ (the perfect fourth), as opposed to $3/2$ (the perfect fifth) into two steps (one major, one minor). --> Its "minor" variant would be
+
 $$
 1\xrightarrow{8/7} 8/7\xrightarrow{7/6} 4/3\xrightarrow{9/8} 3/2\xrightarrow{8/7} 12/7\xrightarrow{7/6} 2.
 $$
