@@ -5,7 +5,7 @@ import asyncio
 import mido
 import math
 
-from .output import output
+from . import output
 
 
 # NOTE: the class below is thread safe, because it only relies on list's pop and append.

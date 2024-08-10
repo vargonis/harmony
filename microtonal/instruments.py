@@ -3,7 +3,7 @@ from numbers import Number
 import asyncio
 import mido
 
-from .output import output
+from . import output
 from .synth import Synth
 
 synth = Synth()

@@ -1,7 +1,8 @@
 import asyncio
 import numpy as np
 
-from microtonal import MelodicInstrument,  GreekChord
+from microtonal.instruments import MelodicInstrument
+from microtonal.greek import GreekChord
 
 
 async def play_arpeggio(program, base, chord, velocity, duration):

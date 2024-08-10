@@ -1,7 +1,8 @@
 import asyncio
 import numpy as np
 
-from microtonal import MelodicInstrument, GreekChord, GreekScale
+from microtonal.instruments import MelodicInstrument
+from microtonal.greek import GreekChord, GreekScale
 
 
 asyncio.run(MelodicInstrument.PercussiveOrgan(300, 100, 1))

@@ -6,6 +6,8 @@ class IterableEnum(Enum):
         return iter(self.value) 
     def __len__(self):
         return len(self.value)
+    def __getitem__(self, key):
+        return self.value[key]
 
 class GreekChord(IterableEnum):
     MAJOR = [1, 5/4, 3/2]
@@ -17,3 +19,8 @@ class GreekScale(IterableEnum):
     MAJOR = [9/8, 10/9, 16/15, 9/8, 10/9, 9/8, 16/15]
     MINOR = [9/8, 16/15, 10/9, 9/8, 16/15, 10/9, 9/8]
 
+class GreekMode(IterableEnum):
+    MAJOR = [1, 9/8, 5/4, 4/3, 3/2, 5/3, 15/8]
+    MINOR = [1, 9/8, 6/5, 4/3, 3/2, 8/5, 16/9]
+    def __rmul__(self, x):
+        return np.array(self.value) * x
