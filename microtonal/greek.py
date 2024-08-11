@@ -7,7 +7,8 @@ class IterableEnum(Enum):
     def __len__(self):
         return len(self.value)
     def __getitem__(self, key):
-        return self.value[key]
+        n, k = divmod(key, len(self.value))
+        return self.value[k] * 2**n
 
 class GreekChord(IterableEnum):
     MAJOR = [1, 5/4, 3/2]
