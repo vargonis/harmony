@@ -2,21 +2,26 @@ import time
 import blinker
 
 from microtonal.instruments import MelodicInstrument, PercussiveInstrument
-from microtonal.greek import GreekMode
-from microtonal.players import Band, TonalPlayer, RythmicPlayer, Pattern
+from microtonal.harmony import GreekMode
+from microtonal.patterns import Note, Pattern, S, T, W
+from microtonal.players import Band, TonalPlayer, RythmicPlayer
 
 band = Band()
 
-pattern = Pattern(4, [(0, 1), (1, 1), (2, 1), (3, 1)], [[0, 2], [1, 2], [0, 2], [1, 2]])
-band["drummer"] = RythmicPlayer(
-    100, pattern,
-    [PercussiveInstrument.AcousticBassDrum, PercussiveInstrument.AcousticSnare, PercussiveInstrument.RideCymbal1],
-)
+kit = [PercussiveInstrument.AcousticBassDrum, PercussiveInstrument.AcousticSnare, PercussiveInstrument.RideCymbal1]
+b = Note(0, 1, 0)
+s = Note(0, 1, 1)
+r = Note(0, 1, 2)
+pattern = Pattern(2, b + T(1) * s)**2 + Pattern(1, r)**4
+band["drummer"] = RythmicPlayer(100, pattern, kit)
 # Test:
 band["drummer"].play_in_loop(1, band.loop)
 
-pattern = Pattern(4, [(0, 3), (3, 1)], [[0, 2, 4], [0, 3, 5]])
-band["organ"] = TonalPlayer(100, pattern, 200, GreekMode.MAJOR, MelodicInstrument.PercussiveOrgan)
+n = Note(0, 1, 0)
+t = n + S(2) * n + S(4) * n
+s = n + S(3) * n + S(5) * n
+pattern = Pattern(3, W(3) * t) * Pattern(1, s)
+band["organ"] = TonalPlayer(100, pattern, 200 * GreekMode.MAJOR, MelodicInstrument.PercussiveOrgan)
 # Test:
 band["organ"].play_in_loop(1, band.loop)
 

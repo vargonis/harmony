@@ -18,7 +18,7 @@ $$
 The rationale behind the choice of the last two steps is: $4/3\cdot 5/4 = 5/3$, and $3/2\cdot 5/4 = 15/8$.
 Now, note that the (multiplicative) "distance" from $4/3$ to $3/2$ is $9/8$, whereas the distance from
 $3/2$ to $5/3$ is $10/9$. We see a remarkable progression of simple ratios that fit together to form the factor $2$.
-The distance from $5/4$ to $4/3$ $16/15$, which is also what's missing to get from $15/8$ to $2$. Thus, we can form a scale by stacking together the following sequence of increments:
+The distance from $5/4$ to $4/3$ is $16/15$, which is also what's missing to get from $15/8$ to $2$. Thus, we can form a scale by stacking together the following sequence of increments:
 
 $$
 1\xrightarrow{9/8} 9/8\xrightarrow{10/9} 5/4\xrightarrow{16/15} 4/3\xrightarrow{9/8} 3/2\xrightarrow{10/9} 5/3\xrightarrow{9/8} 15/8\xrightarrow{16/15} 2.
