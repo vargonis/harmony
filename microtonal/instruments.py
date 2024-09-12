@@ -31,7 +31,7 @@ class MelodicInstrument(Enum):
     RockOrgan = 18
     ChurchOrgan = 19
     ReedOrgan = 20
-    Accordian = 21
+    Accordion = 21
     Harmonica = 22
     Bandoneon = 23
     NylonStringGuitar = 24

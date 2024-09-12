@@ -17,7 +17,7 @@ class Cluster:
     def __len__(self):
         return len(self.value)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int):
         n, k = divmod(key, len(self.value))
         return self.value[k] * 2**n
 
@@ -26,10 +26,17 @@ class Cluster:
             raise TypeError(f'Expected a number, got {type(x)}')
         return Cluster(x * self.value)
 
-    def __pow__(self, other):
+    def extend(self, other: 'Cluster'):
         return Cluster(np.concat([self, (self[len(self) - 1] * other)[1:]]))
     
-    def __add__(self, other):
+    def __pow__(self, other: int):
+        if other == 0:
+            return self
+        if other > 0:
+            return Cluster(np.concatenate([self.value[other:], 2 * self.value[:other]]))
+        return Cluster(np.concatenate([0.5 * self.value[len(self.value) + other:], self.value[:len(self.value) + other]]))
+
+    def __add__(self, other: 'Cluster'):
         return Cluster(np.sort(np.unique(np.concatenate([
             normalize(self), normalize(other)
         ]))))

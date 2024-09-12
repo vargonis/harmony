@@ -12,6 +12,7 @@ curses.set_escdelay(1)
 @dataclass
 class App:
     band: Band
+    n_beats: int # NOTE: consistency between this and the n_beats attribute that each of the band players patterns have is not required. What is required (but not enforced; expect unexpected behaviour) is that the n_beats attribute of the band be greater than or equal to the n_beats attribute of each of the players.
     tempo: float
     handlers: dict[str, callable] = field(default_factory=dict)
 
@@ -20,16 +21,27 @@ class App:
             self.stop = True
         self.handlers["quit"] = quit
 
-    def tick(self):
+    def main_loop(self):
+        beat = 0
+        events = {i: list() for i in range(self.n_beats)}
+        events[0].extend(self.band.keys())
+        def tick():
+            nonlocal beat, events
+            beat_events = events[beat].copy()
+            events[beat].clear()
+            for player in beat_events:
+                self.band.play(player, self.tempo)
+                events[(beat + self.band[player].pattern.n_beats) % self.n_beats].append(player)
+            beat = (beat + 1) % self.n_beats
         while not self.stop:
-            self.band.play(self.tempo)
+            tick()
             time.sleep(self.tempo)
 
     def start(self):
         self.stop = False
         self.messages = ["start"]
-        tick_thread = Thread(target=self.tick)
-        tick_thread.start()
+        main_thread = Thread(target=self.main_loop)
+        main_thread.start()
         def main(win: curses.window):
             win.clear()
             while self.messages[-1] != "quit":
@@ -56,6 +68,6 @@ class App:
                     if handler:
                         handler(*args)
                 except Exception as e:
-                    win.addstr(str(e))
+                    win.addstr(str(e) + '\n')
         curses.wrapper(main)
-        tick_thread.join()
+        main_thread.join()
