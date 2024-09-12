@@ -1,24 +1,25 @@
-from microtonal.patterns import Note, Pattern, S, T, S_, W, Shift
+from microtonal.patterns import Note, Pattern, S, T, W
 
-n = Note(0, 1, 0)
+n = Note(0, 0, 1)
 S(1) * n
 S(1) * T(1) * n
-W(1) * n
+W(2) * n
 
-p = Pattern(16, [T(4*i) * n for i in range(4)])
+Pattern(16, [T(4*i) for i in range(4)])
 p = Pattern(4, n)
 p * p
 p**4
 p**2**2
 
-p + S(1)*p
+(S(0) + S(1)) * n
+(S(0) + S(1)) * p
+(S(0) + T(1)) * p
+(S(0) + T(6)) * p
 
 S(1) * p**4
-q = p + S(1) * p + S(2) * p + S(3) * p
+q = (S(0) + S(1) + S(2) + S(3)) * p
 
-n + S(1) * n + S(2) * n + S(3) * n
+(S(0) + S(1) + S(2) + S(3)) * n
 
-S_(1) * q
-
-p = Pattern(4, n + Shift(1,1) * n + Shift(2,2) * n + Shift(3,3) * n)
+p = Pattern(4, S(0,0,1) + S(1,1,1) + S(2,2,1) + S(3,3,1))
 p * p
