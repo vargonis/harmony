@@ -9,22 +9,22 @@ def normalize(x):
 
 @dataclass
 class Cluster:
-    value: np.ndarray
+    values: np.ndarray
 
     def __iter__(self):
-        return iter(self.value) 
+        return iter(self.values)
 
     def __len__(self):
-        return len(self.value)
+        return len(self.values)
 
     def __getitem__(self, key: int):
         n, k = divmod(key, len(self.value))
-        return self.value[k] * 2**n
+        return self.values[k] * 2**n
 
     def __rmul__(self, x):
         if not isinstance(x, Number):
             raise TypeError(f'Expected a number, got {type(x)}')
-        return Cluster(x * self.value)
+        return Cluster(x * self.values)
 
     def extend(self, other: 'Cluster'):
         return Cluster(np.concat([self, (self[len(self) - 1] * other)[1:]]))
@@ -33,8 +33,8 @@ class Cluster:
         if other == 0:
             return self
         if other > 0:
-            return Cluster(np.concatenate([self.value[other:], 2 * self.value[:other]]))
-        return Cluster(np.concatenate([0.5 * self.value[len(self.value) + other:], self.value[:len(self.value) + other]]))
+            return Cluster(np.concatenate([self.values[other:], 2 * self.values[:other]]))
+        return Cluster(np.concatenate([0.5 * self.values[len(self.values) + other:], self.values[:len(self.values) + other]]))
 
     def __add__(self, other: 'Cluster'):
         return Cluster(np.sort(np.unique(np.concatenate([
@@ -42,15 +42,15 @@ class Cluster:
         ]))))
 
 
-class Chord(ModuleType):
+class ChordType(ModuleType):
     I = Cluster(np.array([1, 5/4, 3/2]))
     Im = Cluster(np.array([1, 6/5, 3/2]))
     II = Cluster(np.array([1, 7/6, 4/3]))
     IIm = Cluster(np.array([1, 8/7, 4/3]))
 
 class GreekChord(ModuleType):
-    MAJOR = Chord.I
-    MINOR = Chord.Im
+    MAJOR = ChordType.I
+    MINOR = ChordType.Im
 
 class GreekMode(ModuleType):
     MAJOR = Cluster(np.array([1, 9/8, 5/4, 4/3, 3/2, 5/3, 15/8])) # == Chord.I + 3/2*Chord.I + 4/3*Chord.I

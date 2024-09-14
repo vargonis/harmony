@@ -2,35 +2,37 @@ import asyncio
 import numpy as np
 
 from microtonal.instruments import MelodicInstrument
-from microtonal.harmony import GreekChord, GreekScale
+from microtonal.harmony import GreekChord, GreekMode
+from microtonal.synth import Synth
+
+synth = Synth()
 
 
-asyncio.run(MelodicInstrument.PercussiveOrgan(300, 100, 1))
-asyncio.run(MelodicInstrument.PercussiveOrgan(300 * np.array([1, 7/6, 4/3]), 100, 1))
-asyncio.run(MelodicInstrument.PercussiveOrgan(300 * GreekChord.MAJOR, 100, 1))
-asyncio.run(MelodicInstrument.YamahaGrandPiano(100 * GreekChord.MINOR, 100, 1))
+asyncio.run(synth.play(MelodicInstrument.PercussiveOrgan, 300, 100, 1))
+asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 7/6, 4/3]), 100, 1))
+asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * GreekChord.MAJOR, 100, 1))
+asyncio.run(synth.play_chord(MelodicInstrument.YamahaGrandPiano, 100 * GreekChord.MINOR, 100, 1))
 
 
-def play_scale(base, scale, instrument, velocity, duration):
-    async def coroutine():
-        freq = base
-        await instrument(freq, velocity, duration)
-        for x in scale:
-            freq *= x
-            await instrument(freq, velocity, duration)
-    asyncio.run(coroutine())
+# def play_scale(base, scale, instrument, velocity, duration):
+#     async def coroutine():
+#         freq = base
+#         await synth.play(instrument,freq, velocity, duration)
+#         for x in scale:
+#             freq *= x
+#             await synth.play(instrument, freq, velocity, duration)
+#     asyncio.run(coroutine())
 
 def play_arpeggio(base, chord, instrument, velocity, duration):
     async def coroutine():
         for x in chord:
-            await instrument(base * x, velocity, duration)
+            await synth.play(instrument, base * x, velocity, duration)
     asyncio.run(coroutine())
 
 
 play_arpeggio(100, GreekChord.MINOR, MelodicInstrument.Dulcimer, 100, .5)
-
-play_scale(100, GreekScale.MAJOR, MelodicInstrument.YamahaGrandPiano, 100, .3)
-play_scale(100, GreekScale.MINOR, MelodicInstrument.YamahaGrandPiano, 100, .1)
+play_arpeggio(100, GreekMode.MAJOR, MelodicInstrument.YamahaGrandPiano, 100, .3)
+play_arpeggio(100, GreekMode.MINOR, MelodicInstrument.YamahaGrandPiano, 100, .1)
 
 
 #%%
@@ -41,14 +43,13 @@ async def test():
     base = 300
     delta = .3
     tasks = [
-        MelodicInstrument.PercussiveOrgan(base, 90, 3),
-        MelodicInstrument.YamahaGrandPiano(base, 127, .3, delay=delta),
+        synth.play(MelodicInstrument.PercussiveOrgan, base, 90, 3),
+        synth.play(MelodicInstrument.YamahaGrandPiano, base, 127, .3, delay=delta),
     ]
-    for x in GreekScale.MAJOR:
-        base *= x
+    for x in GreekMode.MAJOR:
         delta += .3
         # s.schedule(MelodicInstrument.PercussiveOrgan(base, 127, .3), start + delta)
-        tasks.append(MelodicInstrument.YamahaGrandPiano(base, 127, .3, delay=delta))
+        tasks.append(synth.play(MelodicInstrument.YamahaGrandPiano, base * x, 127, .3, delay=delta))
     await asyncio.gather(*tasks)
 
 asyncio.run(test())

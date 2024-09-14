@@ -2,14 +2,17 @@ from dataclasses import dataclass
 import asyncio
 from threading import Thread
 
-from .patterns import Pattern
-from .instruments import MelodicInstrument, PercussiveInstrument
+from .synth import Synth
+from .parts import Part, Note, Chord, Hit
+from .instruments import MelodicInstrument
+
+synth = Synth()
 
 
 @dataclass
 class Player:
     vol: int
-    pattern: Pattern # TODO: vol should be part of pattern
+    part: Part # TODO: vol should be specified in the part
 
     def play_in_loop(self, tempo: float, loop: asyncio.AbstractEventLoop):
         asyncio.run_coroutine_threadsafe(self.play(tempo), loop)
@@ -20,32 +23,35 @@ class Player:
 
 @dataclass
 class TonalPlayer(Player):
-    # mode: Sequence[Number] # harmonic scale
-    instrument: MelodicInstrument # midi terminology: the instrument's program number
+    instrument: MelodicInstrument
+
+    def __post_init__(self):
+        assert all(isinstance(e, Note) or isinstance(e, Chord) for e in self.part.events)
 
     async def play(self, tempo: float):
         tasks = []
-        for note in self.pattern.notes:
-            tasks.append(self.instrument(
-                note.value,
-                self.vol,
-                note.duration * tempo,
-                note.start * tempo),
-            )
+        for e in self.part.events:
+            if isinstance(e, Note):
+                task = synth.play(self.instrument, e.mode[e.index], self.vol, e.duration * tempo, e.start * tempo)
+            else:
+                assert isinstance(e, Chord)
+                task = synth.play_chord(self.instrument, e.cluster.values, self.vol, e.duration * tempo, e.start * tempo)
+            tasks.append(task)
         await asyncio.gather(*tasks)
-        self.callback()
+
 
 @dataclass
 class RythmicPlayer(Player):
-    kit: list[PercussiveInstrument]
+
+    def __post_init__(self):
+        assert all(isinstance(e, Hit) for e in self.part.events)
 
     async def play(self, tempo: float):
         tasks = []
-        for note in self.pattern.notes:
-            tasks.append(self.kit[note.value](
-                self.vol,
-                note.start * tempo,
-            ))
+        for hit in self.part.events:
+            tasks.append(
+                hit.instrument(self.vol, hit.start * tempo)
+            )
         await asyncio.gather(*tasks)
 
 
@@ -64,6 +70,6 @@ class Band(dict[str, Player]):
             raise TypeError(f'Expected Player, got {type(value)}')
         return super().__setitem__(key, value)
 
-    # NOTE: this method does not play all players in the band at the same time, because that would make it hard to have patterns with different lengths.
+    # NOTE: this method does not play all players in the band at the same time, because that would make it hard to have parts with different lengths.
     def play(self, player: str, tempo: float):
         self[player].play_in_loop(tempo, self.loop)

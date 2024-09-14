@@ -1,12 +1,8 @@
 from enum import Enum
-from numbers import Number
 import asyncio
 import mido
 
 from . import output
-from .synth import Synth
-
-synth = Synth()
 
 
 class MelodicInstrument(Enum):
@@ -138,18 +134,6 @@ class MelodicInstrument(Enum):
     Helicopter = 125
     Applause = 126
     GunShot = 127
-
-    async def __call__(
-            self,
-            freq: Number | list[Number],
-            velocity: int | list[int],
-            duration: float,
-            delay: float = 0,
-        ):
-        if isinstance(freq, Number):
-            await synth.play(self, freq, velocity, duration, delay)
-        else:
-            await synth.play_chord(self, freq, velocity, duration, delay)
 
 
 class PercussiveInstrument(Enum):

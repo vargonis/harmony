@@ -12,11 +12,11 @@ curses.set_escdelay(1)
 @dataclass
 class App:
     band: Band
-    n_beats: int # NOTE: consistency between this and the n_beats attribute that each of the band players patterns have is not required. What is required (but not enforced; expect unexpected behaviour) is that the n_beats attribute of the band be greater than or equal to the n_beats attribute of each of the players.
     tempo: float
     handlers: dict[str, callable] = field(default_factory=dict)
 
     def __post_init__(self):
+        self.n_beats = 0
         def quit():
             self.stop = True
         self.handlers["quit"] = quit
@@ -31,13 +31,14 @@ class App:
             events[beat].clear()
             for player in beat_events:
                 self.band.play(player, self.tempo)
-                events[(beat + self.band[player].pattern.n_beats) % self.n_beats].append(player)
+                events[(beat + self.band[player].part.n_beats) % self.n_beats].append(player)
             beat = (beat + 1) % self.n_beats
         while not self.stop:
             tick()
             time.sleep(self.tempo)
 
     def start(self):
+        self.n_beats = max([p.part.n_beats for p in self.band.values()])
         self.stop = False
         self.messages = ["start"]
         main_thread = Thread(target=self.main_loop)
