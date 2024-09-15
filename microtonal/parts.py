@@ -44,6 +44,17 @@ class Chord(Event):
         return Chord(self.start, self.duration, self.cluster ** other)
 
 
+# Convenience constructors:
+def note(index: int, mode: Cluster):
+    return Note(0, 1, index, mode)
+
+def chord(cluster: Cluster):
+    return Chord(0, 1, cluster)
+
+def hit(instrument: PercussiveInstrument):
+    return Hit(0, 1, instrument)
+
+
 @dataclass
 class Part:
     n_beats: int

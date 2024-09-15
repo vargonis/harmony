@@ -2,7 +2,7 @@ from random import randint
 
 from microtonal.instruments import MelodicInstrument
 from microtonal.harmony import ChordType
-from microtonal.parts import Note, Chord, Part, T
+from microtonal.parts import note, chord, Part, T
 from microtonal.players import Band, TonalPlayer
 from microtonal.repl import App
 
@@ -16,16 +16,13 @@ mode = 300 * (
     3/4 * ChordType.II # + 9/16 * Chord.II
 )
 
-def note(i):
-    return Note(0, 1, i, mode)
-
 def rand_part():
-    return Part(8, [T(i) * note(randint(-6, 6)) for i in range(8)])
+    return Part(8, [T(i) * note(randint(-6, 6), mode) for i in range(8)])
 
 parts = [rand_part() for _ in range(3)]
 
-chord_1 = Chord(0, 1, 300 * ChordType.II)
-chord_2 = Chord(0, 1, 3/4 * 300 * ChordType.II)
+chord_1 = chord(300 * ChordType.II)
+chord_2 = chord(3/4 * 300 * ChordType.II)
 
 app.band["bed"] = TonalPlayer(80, Part(8, T(0,6) * chord_1 + T(6,2) * chord_2), MelodicInstrument.AhhChoir)
 app.band["melody"] = TonalPlayer(110, parts[0], MelodicInstrument.Clarinet)
