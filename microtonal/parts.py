@@ -17,11 +17,14 @@ class Event:
     def copy(self):
         return type(self)(*[deepcopy(self.__getattribute__(a.name)) for a in fields(self)])
 
-    def __lt__(self, other: Event):
+    def __lt__(self, other: Event) -> bool:
         return (self.start, self.duration) < (other.start, other.duration)
     
-    def __rmul__(self, other: list[T]):
+    def __rmul__(self, other: list[T]) -> list[Event]:
         return [t * self for t in other]
+    
+    def __add__(self, other: Event) -> list[Event]:
+        return [self, other]
 
 
 @dataclass

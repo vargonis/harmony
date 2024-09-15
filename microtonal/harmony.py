@@ -18,7 +18,7 @@ class Cluster:
         return len(self.values)
 
     def __getitem__(self, key: int):
-        n, k = divmod(key, len(self.value))
+        n, k = divmod(key, len(self.values))
         return self.values[k] * 2**n
 
     def __rmul__(self, x):

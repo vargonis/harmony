@@ -32,9 +32,9 @@ organ_parts = [
 app.band["drums"] = RythmicPlayer(100, drums_parts[0])
 app.band["organ"] = TonalPlayer(100, organ_parts[0], MelodicInstrument.PercussiveOrgan)
 
-# test:
-app.band.play("drums", .4)
-app.band.play("organ", .4)
+# # test:
+# app.band.play("drums", .4)
+# app.band.play("organ", .4)
 
 def change_drums_part(p: str):
     app.band["drums"].part = drums_parts[int(p)]
