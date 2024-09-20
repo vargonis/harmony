@@ -23,7 +23,6 @@ class Synth:
             duration: float,
             delay: float = 0,
         ):
-        # the return value functions as an id, to turn the note off later (thus liberating its channel)
         if delay > 0:
             await asyncio.sleep(delay)
         try:

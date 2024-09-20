@@ -12,13 +12,13 @@ from .harmony import Cluster
 class Event:
     start: float # beat number
     duration: float # in beats
-    # intensity: float # Volume. Leave it out, for now
+    intensity: float # volume (normalized)
 
     def copy(self):
         return type(self)(*[deepcopy(self.__getattribute__(a.name)) for a in fields(self)])
 
     def __lt__(self, other: Event) -> bool:
-        return (self.start, self.duration) < (other.start, other.duration)
+        return (self.start, self.duration, self.intensity) < (other.start, other.duration, other.intensity)
     
     def __rmul__(self, other: list[T]) -> list[Event]:
         return [t * self for t in other]
@@ -41,18 +41,18 @@ class Chord(Event):
     cluster: Cluster
 
     def __pow__(self, other: int):
-        return Chord(self.start, self.duration, self.cluster ** other)
+        return Chord(self.start, self.duration, self.intensity, self.cluster ** other)
 
 
 # Convenience constructors:
-def note(index: int, mode: Cluster):
-    return Note(0, 1, index, mode)
+def note(index: int, mode: Cluster, vol=1):
+    return Note(0, 1, vol, index, mode)
 
-def chord(cluster: Cluster):
-    return Chord(0, 1, cluster)
+def chord(cluster: Cluster, vol=1):
+    return Chord(0, 1, vol, cluster)
 
-def hit(instrument: PercussiveInstrument):
-    return Hit(0, 1, instrument)
+def hit(instrument: PercussiveInstrument, vol=1):
+    return Hit(0, 1, vol, instrument)
 
 
 @dataclass
@@ -90,17 +90,19 @@ class Part:
 class T:
     start: float
     duration: float = 1
+    intensity: float = 1
 
     def __mul__(self, other: Event | Part | T | list[T]):
         if isinstance(other, Event):
             event = other.copy()
             event.start += self.start
             event.duration *= self.duration
+            event.intensity *= self.intensity
             return event
         if isinstance(other, Part):
             return Part(other.n_beats, [self * e for e in other.events])
         if isinstance(other, T):
-            return T(self.start + other.start, self.duration * other.duration)
+            return T(self.start + other.start, self.duration * other.duration, self.intensity * other.intensity)
         assert isinstance(other, list), f"Expected Event, Part, T or list, got {type(other)}"
         return [self * t for t in other]
     

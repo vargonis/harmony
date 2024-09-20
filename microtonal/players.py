@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import asyncio
 from threading import Thread
@@ -10,9 +11,13 @@ synth = Synth()
 
 
 @dataclass
-class Player:
-    vol: int
-    part: Part # TODO: vol should be specified in the part
+class Player(ABC):
+    vol: int # velocity, in midi messages (will be rescaled by the intensity of the played events)
+    part: Part
+
+    @abstractmethod
+    async def play(self, tempo: float):
+        ...
 
     def play_in_loop(self, tempo: float, loop: asyncio.AbstractEventLoop):
         asyncio.run_coroutine_threadsafe(self.play(tempo), loop)
@@ -32,13 +37,24 @@ class TonalPlayer(Player):
         tasks = []
         for e in self.part.events:
             if isinstance(e, Note):
-                task = synth.play(self.instrument, e.mode[e.index], self.vol, e.duration * tempo, e.start * tempo)
+                task = synth.play(
+                    self.instrument,
+                    e.mode[e.index],
+                    round(self.vol * e.intensity),
+                    e.duration * tempo,
+                    e.start * tempo,
+                )
             else:
                 assert isinstance(e, Chord)
-                task = synth.play_chord(self.instrument, e.cluster.values, self.vol, e.duration * tempo, e.start * tempo)
+                task = synth.play_chord(
+                    self.instrument,
+                    e.cluster.values,
+                    round(self.vol * e.intensity),
+                    e.duration * tempo,
+                    e.start * tempo,
+                )
             tasks.append(task)
         await asyncio.gather(*tasks)
-
 
 @dataclass
 class RythmicPlayer(Player):
@@ -50,7 +66,7 @@ class RythmicPlayer(Player):
         tasks = []
         for hit in self.part.events:
             tasks.append(
-                hit.instrument(self.vol, hit.start * tempo)
+                hit.instrument(round(self.vol * hit.intensity), hit.start * tempo)
             )
         await asyncio.gather(*tasks)
 

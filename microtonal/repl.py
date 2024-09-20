@@ -13,17 +13,17 @@ curses.set_escdelay(1)
 class App:
     band: Band
     tempo: float
-    handlers: dict[str, callable] = field(default_factory=dict)
+    handlers: dict[str, callable] = field(default_factory=dict) # defines how the app will react to user input
 
     def __post_init__(self):
         self.n_beats = 0
         def quit():
             self.stop = True
-        self.handlers["quit"] = quit
+        self.handlers["quit"] = quit # so, input "quit" to stop the app
 
-    def main_loop(self):
-        beat = 0
-        events = {i: list() for i in range(self.n_beats)}
+    def tick_loop(self):
+        beat: int = 0
+        events: list[int, str] = {i: list() for i in range(self.n_beats)} # We keep a list of players to be triggered on each beat of the current measure. TODO: it might be tempting to consider using floats instead of integers, to allow for triggering players in between beats (we use this dictionary just to allow for band players with different n_beats each, thus needing to re-start them at shifting beats, as the loop proceeds). This level of generality does not seem to be musically necessary.
         events[0].extend(self.band.keys())
         def tick():
             nonlocal beat, events
@@ -40,9 +40,9 @@ class App:
     def start(self):
         self.n_beats = max([p.part.n_beats for p in self.band.values()])
         self.stop = False
-        self.messages = ["start"]
-        main_thread = Thread(target=self.main_loop)
-        main_thread.start()
+        self.messages = ["start"] # no particular use for this, it just feels nice to log the start of the app
+        tick_thread = Thread(target=self.tick_loop)
+        tick_thread.start()
         def main(win: curses.window):
             win.clear()
             while self.messages[-1] != "quit":
@@ -71,4 +71,4 @@ class App:
                 except Exception as e:
                     win.addstr(str(e) + '\n')
         curses.wrapper(main)
-        main_thread.join()
+        tick_thread.join()
