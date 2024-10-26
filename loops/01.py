@@ -1,7 +1,7 @@
 from microtonal.instruments import MelodicInstrument, PercussiveInstrument
-from microtonal.harmony import ChordType
-from microtonal.parts import chord, hit, Part, T
-from microtonal.players import Band, TonalPlayer, RythmicPlayer
+from microtonal.harmony import Major, minor, T
+from microtonal.events import chord, hit, at
+from microtonal.players import Band, TonalPlayer, RythmicPlayer, Part
 from microtonal.repl import App
 
 app = App(
@@ -10,23 +10,28 @@ app = App(
 )
 
 d = hit(PercussiveInstrument.AcousticBassDrum)
+
 s = hit(PercussiveInstrument.AcousticSnare)
 r = hit(PercussiveInstrument.RideCymbal1)
-snare = Part(2, T(1) * s)
-drum_1 = Part(8, (T(0) + T(1.5) + T(6.5)) * d)
-drum_2 = Part(8, (T(0) + T(1.5) + T(4.5) + T(6) + T(6.5)) * d)
+snare = Part(2, at(1) * s)
+drum_1 = Part(8, (at(0) + at(1.5) + at(6.5)) * d)
+drum_2 = Part(8, (at(0) + at(1.5) + at(4.5) + at(6) + at(6.5)) * d)
 ride = Part(1, r)
 drums_parts = [
     drum_1 + snare**4,
     drum_2 + snare**4 + ride**8,
 ]
+# d.play()
 
 base = 300
-tonic = chord(base * ChordType.I)
-subdominant = chord(3/4 * base * ChordType.I)
+tonic = chord(Major(3, base))
+subdominant = chord(Major(3, 3/4 * base))
+# tonic.play(MelodicInstrument.PercussiveOrgan)
+# (subdominant**T(2)).play(MelodicInstrument.PercussiveOrgan)
+
 organ_parts = [
-    Part(6, T(0,6) * tonic**-1) * Part(2, T(0,2) * subdominant**1)
-    # Part(8, T(0,6) * tonic**-1 + T(6,2) * subdominant**1) # equivalent
+    Part(6, at(0,6) * tonic) * Part(2, at(0,2) * subdominant**T(2))
+    # Part(8, at(0,6) * tonic + at(6,2) * subdominant**T(2)) # equivalent
 ]
 
 app.band["drums"] = RythmicPlayer(100, drums_parts[0])

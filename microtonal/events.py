@@ -2,9 +2,12 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 from functools import total_ordering
 from copy import deepcopy
+from numbers import Number
+import asyncio
 
-from .instruments import PercussiveInstrument
-from .harmony import Cluster
+from . import synth
+from .harmony import Cluster, T
+from .instruments import MelodicInstrument, PercussiveInstrument
 
 
 @total_ordering
@@ -20,7 +23,7 @@ class Event:
     def __lt__(self, other: Event) -> bool:
         return (self.start, self.duration, self.intensity) < (other.start, other.duration, other.intensity)
     
-    def __rmul__(self, other: list[T]) -> list[Event]:
+    def __rmul__(self, other: list[at]) -> list[Event]:
         return [t * self for t in other]
     
     def __add__(self, other: Event) -> list[Event]:
@@ -29,26 +32,41 @@ class Event:
 
 @dataclass
 class Note(Event):
-    index: int
-    mode: Cluster
+    frequency: Number
+
+    def play(self, instrument: MelodicInstrument):
+        asyncio.run(synth.play_note(instrument.value, self.frequency, round(127 * self.intensity), self.duration))
+
 
 @dataclass
 class Hit(Event):
     instrument: PercussiveInstrument
 
+    def play(self):
+        asyncio.run(synth.play_hit(self.instrument.value, round(127 * self.intensity)))
+
+
 @dataclass
 class Chord(Event):
     cluster: Cluster
 
-    def __pow__(self, other: int):
+    def play(self, instrument: MelodicInstrument):
+        asyncio.run(synth.play_chord(instrument.value, self.cluster, round(127 * self.intensity), self.duration))
+
+    def play_arpeggio(self, instrument: MelodicInstrument, note_duration=.3):
+        for x in self.cluster:
+            asyncio.run(synth.play_note(instrument.value, x, round(127 * self.intensity), note_duration))
+        asyncio.run(synth.play_note(instrument.value, self.cluster[len(self.cluster)], round(127 * self.intensity), note_duration))
+
+    def __pow__(self, other: T):
         return Chord(self.start, self.duration, self.intensity, self.cluster ** other)
 
 
 # Convenience constructors:
 def note(index: int, mode: Cluster, vol=1):
-    return Note(0, 1, vol, index, mode)
+    return Note(0, 1, vol, mode[index])
 
-def chord(cluster: Cluster, vol=1):
+def chord(cluster: Cluster, vol=1): # TODO: add support for chords with non-homogeneous note intensities
     return Chord(0, 1, vol, cluster)
 
 def hit(instrument: PercussiveInstrument, vol=1):
@@ -56,58 +74,28 @@ def hit(instrument: PercussiveInstrument, vol=1):
 
 
 @dataclass
-class Part:
-    n_beats: int
-    events: list[Event] | Event # second possibility just to facilitate construction: it would be converted to singleton on __post_init__
-
-    def __post_init__(self):
-        if isinstance(self.events, Event):
-            self.events = [self.events]
-        self.events.sort()
-
-    def __add__(self, other: Part):
-        if self.n_beats != other.n_beats:
-            raise ValueError("Parts must have the same number of beats")
-        events = deepcopy(self.events) + deepcopy(other.events)
-        return Part(self.n_beats, events)
-
-    def __mul__(self, other: Part):
-        n_beats = self.n_beats + other.n_beats
-        events = deepcopy(self.events) + [T(self.n_beats) * e for e in other.events]
-        return Part(n_beats, events)
-    
-    def __rmul__(self, other: list[T]):
-        return sum([s * self for s in other], start=Part(self.n_beats, []))
-
-    def __pow__(self, n: int):
-        part = self
-        for _ in range(n - 1):
-            part = self * part
-        return part
-
-
-@dataclass
-class T:
+class at:
     start: float
     duration: float = 1
     intensity: float = 1
 
-    def __mul__(self, other: Event | Part | T | list[T]):
+    # def __mul__(self, other: Event | Part | at | list[at]):
+    def __mul__(self, other: Event | at | list[at]):
         if isinstance(other, Event):
             event = other.copy()
             event.start += self.start
             event.duration *= self.duration
             event.intensity *= self.intensity
             return event
-        if isinstance(other, Part):
-            return Part(other.n_beats, [self * e for e in other.events])
-        if isinstance(other, T):
+        # if isinstance(other, Part):
+        #     return Part(other.n_beats, [self * e for e in other.events])
+        if isinstance(other, at):
             return T(self.start + other.start, self.duration * other.duration, self.intensity * other.intensity)
         assert isinstance(other, list), f"Expected Event, Part, T or list, got {type(other)}"
         return [self * t for t in other]
     
-    def __add__(self, other: T) -> list[T]:
+    def __add__(self, other: at) -> list[at]:
         return [self, other]
 
-    def __radd__(self, other: list[T]) -> list[T]:
+    def __radd__(self, other: list[at]) -> list[at]:
         return other + [self]

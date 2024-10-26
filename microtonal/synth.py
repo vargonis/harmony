@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 from typing import Iterable
 from numbers import Number
-import asyncio
-import mido
 import math
+import mido
+import asyncio
 
-from . import output
-from .instruments import MelodicInstrument
+# from .instruments import MelodicInstrument # circulariry
+# from .events import Hit, Note, Chord # would introduce circularity
+
+output = mido.open_output()
 
 
 # NOTE: the class below is thread safe, because it only relies on list's pop and append.
@@ -15,10 +17,21 @@ from .instruments import MelodicInstrument
 class Synth:
     channels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15] # channel 9 is for percussion
 
-    async def play(
+    async def play_hit(
             self,
-            instrument: MelodicInstrument,
-            freq: Number,
+            instrument: int,
+            velocity: int,
+            delay: float = 0,
+        ):
+        # TODO: add support for muffling or muting (ie take into account the hit duration)
+        if delay > 0:
+            await asyncio.sleep(delay)
+        output.send(mido.Message('note_on', channel=9, note=instrument, velocity=velocity))
+
+    async def play_note(
+            self,
+            program: int,
+            frequency: float,
             velocity: int,
             duration: float,
             delay: float = 0,
@@ -29,10 +42,10 @@ class Synth:
             channel = self.channels.pop()
         except:
             raise Exception('No channels available')
-        output.send(mido.Message('program_change', channel=channel, program=instrument.value))
-        midi_note = int(69 + 12 * math.log2(freq / 440.0))
-        note_frequency = 440.0 * pow(2.0, (midi_note - 69) / 12.0)
-        pitch_bend = int(8191 * math.log2(freq / note_frequency) * 6)
+        output.send(mido.Message('program_change', channel=channel, program=program))
+        midi_note = int(69 + 12 * math.log2(frequency / 440.0))
+        tempered_frequency = 440.0 * pow(2.0, (midi_note - 69) / 12.0)
+        pitch_bend = int(8191 * math.log2(frequency / tempered_frequency) * 6)
         output.send(mido.Message('pitchwheel', channel=channel, pitch=pitch_bend))
         output.send(mido.Message('note_on', channel=channel, note=midi_note, velocity=velocity))
         await asyncio.sleep(duration)
@@ -41,15 +54,14 @@ class Synth:
 
     async def play_chord(
             self,
-            instrument: MelodicInstrument,
-            freqs: Iterable[Number],
-            velocities: int | Iterable[int],
+            program: int,
+            frequencies: Iterable[Number],
+            velocity: int,
             duration: float,
             delay: float = 0,
         ):
-        if isinstance(velocities, int):
-            velocities = [velocities] * len(freqs)
-        # print(chord, velocities)
         if delay > 0:
             await asyncio.sleep(delay)
-        await asyncio.gather(*[self.play(instrument, freq, velocity, duration) for freq, velocity in zip(freqs, velocities)])
+        await asyncio.gather(
+            *[self.play_note(program, x, velocity, duration) for x in frequencies]
+        )

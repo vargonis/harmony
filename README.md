@@ -39,9 +39,9 @@ $$
 
 (Explain well-temperedness.)
 
-## Going deeper
+## The mathematics of harmony
 
-At the heart of harmony is the following fact:
+At the heart of the above harmonic subdivisions is the following fact:
 
 $$
 \frac{n+1}{n} = \frac{2n+2}{2n+1} \frac{2n+1}{2n}
@@ -59,11 +59,44 @@ $$
 1\xrightarrow{8/7} 8/7\xrightarrow{7/6} 4/3\xrightarrow{9/8} 3/2\xrightarrow{8/7} 12/7\xrightarrow{7/6} 2.
 $$
 
+### Going deeper
+
+Now, this only scratchs the surface. Consider the following sequences:
+$$
+(2, 3) / 2 \quad \rightarrow\quad \text{a perfect fifth}
+$$
+$$
+(3, 4, 5) / 3 \quad \rightarrow\quad \text{a major chord (2nd inversion)}
+$$
+$$
+(4, 5, 6, 7) / 4 \quad \rightarrow\quad \text{a dominant chord (fundamental position)}
+$$
+$$
+(5, 6, 7, 8, 9) / 5 \quad \rightarrow\quad \text{some new stuff from now on...}
+$$
+
+But there's more: now consider their corresponding "inversions":
+$$
+4 / (4,3) \quad \rightarrow\quad \text{a perfect fourth}
+$$
+$$
+6 / (6,5,4) \quad \rightarrow\quad \text{a minor chord (fundamental position)}
+$$
+$$
+8 / (8,7,6,5) \quad \rightarrow\quad \text{a minor-7th chord (2nd inversion)}
+$$
+$$
+10 / (10,9,8,7,6) \quad \rightarrow\quad \text{?}
+$$
+We want to explore the vast musical landscape that opens up with the observations above.
+
 ## Software implementation
 
-We need a simple synthesizer that supports arbitrary frequency notes. Here we list some implementation possibilities.
+We need a simple synthesizer that supports arbitrary frequency notes. In order to avoid implementing it from scratch, we've hacked a way to do it with standard tools.
 
 ### Python's `mido` + `fluidsynth`
+
+This is our current implementation. Here are some rough setup notes.
 
 `pip install mido python-rtmidi`.
 
@@ -77,10 +110,12 @@ Problem: as `Qjackctl` shows, `fluidsynth` is not connected to playback output o
 
 Now, to generate arbitrary frequency samples we need to use the `pitch` attribute, which is associated to a channel, not a single note. Thus, each channel becomes single-note, for microtonal purposes. This is a shame, but works for simple tests (polyphony is severely restricted).
 
-### ALSA Example
+### Potential alternatives
+
+#### Use ALSA
 
 To compile, need to `sudo apt-get install libasound2-dev`. Then, `gcc alsa.c -lasound`. See https://www.linuxjournal.com/article/6735.
 
-### Other possibilities
+#### Possibly useful links
 
 Pyfluidsynth, [faust](https://faustdoc.grame.fr/), [supercollider](https://supercollider.github.io/). See https://wiki.linuxaudio.org/wiki/start.

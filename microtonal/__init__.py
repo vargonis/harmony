@@ -1,3 +1,3 @@
-import mido
+from .synth import Synth
 
-output = mido.open_output()
+synth = Synth()

@@ -1,84 +1,41 @@
-import asyncio
-import numpy as np
-
-from microtonal.synth import Synth
 from microtonal.instruments import MelodicInstrument
-from microtonal.harmony import GreekChord
-
-synth = Synth()
-
-
-async def play_arpeggio(instrument, base, chord, velocity, duration):
-    for x in chord:
-        await synth.play(instrument, base * x, velocity, duration)
-
-#%%
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 7/6]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 7/6, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 8/7, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 400 * np.array([1, 8/7, 4/3]), 100, 1))
-
-for _ in range(3):
-    asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 7/6, 4/3]), 100, 1))
-    asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 3/2, 7/4]), 100, 1))
-
-for _ in range(3):
-    asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1/2, 7/6, 4/3]), 100, 1))
-    asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1/2, 7/8, 3/2]), 100, 1))
+from microtonal.harmony import Major, minor
+from microtonal.events import chord
 
 
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 7/6, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * 4/3 * np.array([1, 7/6, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([3/2, 7/4, 2]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 7/6, 4/3]), 100, 1))
+chord(Major(3, 300)).play(MelodicInstrument.Fiddle)
+chord(minor(3, 300)).play(MelodicInstrument.Fiddle)
 
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * np.array([1, 7/6, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * 5/4 * np.array([1, 7/6, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * 4/3 * np.array([1, 7/6, 4/3]), 100, 1))
-asyncio.run(synth.play_chord(MelodicInstrument.PercussiveOrgan, 300 * GreekChord.MAJOR, 100, 1))
+chord(Major(4, 300)).play(MelodicInstrument.Fiddle)
+chord(minor(4, 300)).play(MelodicInstrument.Fiddle)
+
+chord(Major(5, 300)).play(MelodicInstrument.Fiddle)
+chord(minor(5, 300)).play(MelodicInstrument.Fiddle)
+
+chord(Major(6, 300)).play(MelodicInstrument.Fiddle)
+chord(minor(6, 300)).play(MelodicInstrument.Fiddle)
 
 
-#%%
-base = 200
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 4/3, 3/2, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 7/6, 4/3, 3/2, 7/4, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.YamahaGrandPiano, base, [1, 7/6, 4/3, 3/2, 7/4, 2], 127, .7))
+chord(Major(8, 300)).play_arpeggio(MelodicInstrument.Fiddle)
+chord(minor(8, 300)).play_arpeggio(MelodicInstrument.Fiddle)
 
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 9/8, 7/6, 6/5, 5/4, 4/3, 3/2, 8/5, 7/4, 16/9, 15/8, 2], 127, .5))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 9/8, 5/4, 4/3, 3/2, 7/4, 15/8, 2], 127, .5))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 9/8, 5/4, 4/3, 3/2, 5/3, 15/8, 2], 127, .5))
+chord(Major(12, 300)).play_arpeggio(MelodicInstrument.Fiddle)
+chord(minor(12, 300)).play_arpeggio(MelodicInstrument.Fiddle)
 
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 9/8, 7/6, 5/4, 4/3, 3/2, 5/3, 7/4, 15/8, 2], 127, .5))
 
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 7/6, 9/7, 4/3, 3/2, 7/4, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 7/6, 9/7, 3/2, 12/7, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 8/7, 9/7, 3/2, 12/7, 2], 127, .7))
+for _ in range(5):
+    chord(Major(3, 300)).play_arpeggio(MelodicInstrument.Fiddle)
+    chord(minor(3, 300)).play_arpeggio(MelodicInstrument.Fiddle)
 
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 8/9, 4/5, 3/2, 7/4, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 8/9, 4/5, 2/3, 4/7, 1/2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 9/8, 5/4, 3/2, 7/4, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 10/9, 5/4, 3/2, 7/4, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 10/9, 5/4, 3/2, 12/7, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, base, [1, 10/9, 5/4, 3/2, 17/7, 2], 127, .7))
 
-asyncio.run(play_arpeggio(MelodicInstrument.BowedGlass, base, [1, 10/9, 5/4, 3/2, 17/7, 2], 127, .7))
+chord(Major(5, 300)).play_arpeggio(MelodicInstrument.Fiddle)
+chord(minor(5, 300)).play_arpeggio(MelodicInstrument.Fiddle)
 
-asyncio.run(play_arpeggio(MelodicInstrument.BowedGlass, base, [1, 8/7, 9/7, 10/7, 11/7, 12/7, 13/7, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet, base, [1, 8/7, 9/7, 10/7, 11/7, 12/7, 13/7, 2, 13/7, 12/7, 11/7, 10/7, 9/7, 8/7, 1], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet , base, [1, 7/6, 8/6, 9/6, 10/6, 11/6, 2], 127, .7))
+chord(Major(6, 300)).play_arpeggio(MelodicInstrument.Fiddle)
+chord(minor(6, 300)).play_arpeggio(MelodicInstrument.Fiddle)
 
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet , base, [1, 7/6, 8/6, 9/6, 10/6, 11/6, 2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet , base, [1, 7/6, 8/6, 9/6, 10/6, 11/6, 2, 11/6, 10/6, 9/6, 8/6, 7/6, 1], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet , 2 * base, [1/2, 6/11, 6/10, 6/9, 6/8, 6/7, 1, 6/7, 6/8, 6/9, 6/10, 6/11, 1/2], 127, .7))
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet , 2 * base, [6/12, 6/11, 6/10, 6/9, 6/8, 6/9, 6/10, 6/11, 6/12], 127, .7))
+chord(Major(7, 300)).play_arpeggio(MelodicInstrument.Fiddle)
+chord(minor(7, 300)).play_arpeggio(MelodicInstrument.Fiddle)
 
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet , base, [1, 7/6, 8/6, 9/6, 8/6, 7/6, 1], 127, .7))
-asyncio.run(synth.play_chord(MelodicInstrument.Clarinet, base * np.array([1]), 100, 2))
-asyncio.run(synth.play_chord(MelodicInstrument.Clarinet, base * np.array([1, 7/6]), 100, 2))
-asyncio.run(synth.play_chord(MelodicInstrument.Clarinet, base * np.array([1, 7/6, 8/6]), 100, 2))
-asyncio.run(synth.play_chord(MelodicInstrument.Clarinet, base * np.array([1, 7/6, 8/6, 9/6]), 100, 2))
-
-#%%
-asyncio.run(play_arpeggio(MelodicInstrument.Fiddle, 300, [1, 7/6, 4/3], 127, .5))
-asyncio.run(play_arpeggio(MelodicInstrument.Clarinet, 220, [1, 6/5, 4/3], 127, .5))
+chord(Major(9, 300)).play_arpeggio(MelodicInstrument.Fiddle)
+chord(minor(9, 300)).play_arpeggio(MelodicInstrument.Fiddle)

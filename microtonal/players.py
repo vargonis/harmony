@@ -1,13 +1,43 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from copy import deepcopy
 import asyncio
 from threading import Thread
 
-from .synth import Synth
-from .parts import Part, Note, Chord, Hit
+from . import synth
+from .events import Event, Note, Chord, Hit, at
 from .instruments import MelodicInstrument
 
-synth = Synth()
+
+@dataclass
+class Part:
+    n_beats: int
+    events: list[Event] | Event # second possibility just to facilitate construction: it would be converted to singleton on __post_init__
+
+    def __post_init__(self):
+        if isinstance(self.events, Event):
+            self.events = [self.events]
+        self.events.sort()
+
+    def __add__(self, other: 'Part'):
+        if self.n_beats != other.n_beats:
+            raise ValueError("Parts must have the same number of beats")
+        events = deepcopy(self.events) + deepcopy(other.events)
+        return Part(self.n_beats, events)
+
+    def __mul__(self, other: 'Part'):
+        n_beats = self.n_beats + other.n_beats
+        events = deepcopy(self.events) + [at(self.n_beats) * e for e in other.events]
+        return Part(n_beats, events)
+    
+    def __rmul__(self, other: list[at]):
+        return sum([s * self for s in other], start=Part(self.n_beats, []))
+
+    def __pow__(self, n: int):
+        part = self
+        for _ in range(n - 1):
+            part = self * part
+        return part
 
 
 @dataclass
@@ -37,9 +67,9 @@ class TonalPlayer(Player):
         tasks = []
         for e in self.part.events:
             if isinstance(e, Note):
-                task = synth.play(
-                    self.instrument,
-                    e.mode[e.index],
+                task = synth.play_note(
+                    self.instrument.value,
+                    e.frequency,
                     round(self.vol * e.intensity),
                     e.duration * tempo,
                     e.start * tempo,
@@ -47,7 +77,7 @@ class TonalPlayer(Player):
             else:
                 assert isinstance(e, Chord)
                 task = synth.play_chord(
-                    self.instrument,
+                    self.instrument.value,
                     e.cluster.values,
                     round(self.vol * e.intensity),
                     e.duration * tempo,
@@ -65,9 +95,7 @@ class RythmicPlayer(Player):
     async def play(self, tempo: float):
         tasks = []
         for hit in self.part.events:
-            tasks.append(
-                hit.instrument(round(self.vol * hit.intensity), hit.start * tempo)
-            )
+            tasks.append(synth.play_hit(hit.instrument.value, round(self.vol * hit.intensity), hit.start * tempo))
         await asyncio.gather(*tasks)
 
 

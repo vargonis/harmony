@@ -1,9 +1,4 @@
 from enum import Enum
-import asyncio
-import mido
-
-from . import output
-
 
 class MelodicInstrument(Enum):
     YamahaGrandPiano = 0
@@ -184,9 +179,3 @@ class PercussiveInstrument(Enum):
     OpenCuica = 79
     MuteTriangle = 80
     OpenTriangle = 81
-
-    # This naive interface does not enable "muffling" or "muting" of the instrument. TODO: improve
-    async def __call__(self, velocity: int, delay: float = 0):
-        if delay > 0:
-            await asyncio.sleep(delay)
-        output.send(mido.Message('note_on', channel=9, note=self.value, velocity=velocity))
