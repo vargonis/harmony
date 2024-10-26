@@ -62,32 +62,41 @@ $$
 ### Going deeper
 
 Now, this only scratchs the surface. Consider the following sequences:
+
 $$
 (2, 3) / 2 \quad \rightarrow\quad \text{a perfect fifth}
 $$
+
 $$
 (3, 4, 5) / 3 \quad \rightarrow\quad \text{a major chord (2nd inversion)}
 $$
+
 $$
 (4, 5, 6, 7) / 4 \quad \rightarrow\quad \text{a dominant chord (fundamental position)}
 $$
+
 $$
 (5, 6, 7, 8, 9) / 5 \quad \rightarrow\quad \text{some new stuff from now on...}
 $$
 
 But there's more: now consider their corresponding "inversions":
+
 $$
 4 / (4,3) \quad \rightarrow\quad \text{a perfect fourth}
 $$
+
 $$
 6 / (6,5,4) \quad \rightarrow\quad \text{a minor chord (fundamental position)}
 $$
+
 $$
 8 / (8,7,6,5) \quad \rightarrow\quad \text{a minor-7th chord (2nd inversion)}
 $$
+
 $$
 10 / (10,9,8,7,6) \quad \rightarrow\quad \text{?}
 $$
+
 We want to explore the vast musical landscape that opens up with the observations above.
 
 ## Software implementation
